@@ -1,0 +1,49 @@
+.App {
+  background-color: #fff;
+  padding: 20px;
+}
+
+.container {
+  border: 1px solid gray;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+}
+
+.form-input {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-input label {
+  font-size: 16px;
+}
+
+.form-input input {
+  font-size: 16px;
+  height: 40px;
+  padding-left: 10px;
+}
+
+.form-input select {
+  font-size: 16px;
+  height: 40px;
+  padding-left: 10px;
+}
+
+button {
+  padding: 10px;
+  background: #1a6b2d;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+}

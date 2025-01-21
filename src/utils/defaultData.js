@@ -1,0 +1,106 @@
+export const createWorkspace = {
+  name: "simplexi",
+  eventCallbackUrl: "http://localhost:9091/v1/callback/events",
+  multiTaskEnabled: true,
+  queueOrderPriority: "FIFO",
+  eventsFilters: [
+    "activity.created",
+    "activity.updated",
+    "activity.deleted",
+    "worker.created",
+    "worker.activity.update",
+    "worker.attributes.update",
+    "worker.capacity.update",
+    "worker.channel.availability.update",
+    "reservation.created",
+    "reservation.accepted",
+    "reservation.rejected",
+    "reservation.timeout",
+    "reservation.canceled",
+    "reservation.rescinded",
+    "reservation.completed",
+    "reservation.wrapup",
+    "task-channel.created",
+    "task-channel.updated",
+    "task.created",
+    "task.updated",
+    "task.canceled",
+    "task.wrapup",
+    "task.reserved",
+    "task.assigned",
+    "task.completed",
+    "task-queue.created",
+    "task-queue.deleted",
+    "task-queue.entered",
+    "task-queue.timeout",
+    "task-queue.moved",
+    "task-queue.expression.updated",
+    "workflow.created",
+    "workflow.updated",
+    "workflow.deleted",
+    "workflow.entered",
+    "workflow.timeout",
+    "workflow.skipped",
+    "workflow.target-matched",
+    "workspace.created",
+    "workspace.updated",
+  ],
+  defaultActivityId: "",
+  timeoutActivityId: "",
+};
+
+export const workspaceData = {
+  name: "",
+  eventCallbackUrl: "",
+  multiTaskEnabled: "",
+  queueOrderPriority: "FIFO",
+  eventsFilters: ["workspace.created"],
+  defaultActivityId: "",
+  timeoutActivityId: "",
+  workspaceId: "",
+};
+
+export const defaultQueueData = {
+  name: "sales-queue",
+  taskOrder: "FIFO",
+  expression: "HAS(#{language},'en') && #{department}=='sales'",
+  maxReservedWorkers: 50,
+  reservationActivityId: null,
+  assignmentActivityId: null,
+  workspaceId: "",
+};
+
+export const defaultWorksflowData = {
+  name: "",
+  configuration: `{"task_routing":{"filters":[{"name":"en-sales","expression":"#{language}==\'en\'&&#{department}==\'sales\'","targets":[{"queue":"WQcu36np9uljv09kfvvvu0","priority":10,"timeout":3600}]},{"name":"en-support","expression":"#{language}==\'en\'&&#{department}==\'support\'","targets":[{"queue":"WQcu36np9uljv09kfvvvu0","priority":0,"timeout":3600,"expression":"#{task.preferred_agents}==#{worker.agent_id}"}]}],"default_filter":{"queue":"WQcu36np9uljv09kfvvvu0"}}}`,
+  documentContentType: "application/json",
+  taskReservationTimeout: 3600,
+  assignmentCallbackUrl: "http://localhost:9091/v1/callback/assignment/created",
+  fallbackCallbackUrl: null,
+  workspaceId: "",
+};
+
+export const defaultWorkerData = {
+  name: "Ejiroghene Precious",
+  attributes: {
+    language: ["en"],
+    department: "sales",
+  },
+  activity: "WAcu1fgapn91tb8ueretvg",
+  workspaceId: "",
+};
+
+export const defaultTaskData = {
+  workflowId: "WWcu190khn91t78qvvvvvg",
+  taskChannel: "voice",
+  priority: 10,
+  timeout: 600,
+  attributes: {
+    language: ["en"],
+    department: "sales",
+  },
+  ignoreCapacity: false,
+  queueId: "WQcu1790pn91t4dp7vvvog",
+  callbackUrl: "http://example.com/task/callback",
+  workspaceId: "",
+};
