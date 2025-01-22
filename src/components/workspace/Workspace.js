@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CreateWorkspace from "./CreateWorkspace";
 import UpdateWorkspace from "./UpdateWorkspace";
 import {
@@ -25,6 +25,8 @@ import {
   getWorkerReservationApi,
   updateWorkerApi,
 } from "../../utils/api/worker";
+import { AppContext } from "../../store/store";
+
 
 function Workspace() {
   const [defaultWorkspace, setDefaultWorkspace] = useState(createWorkspace);
@@ -50,7 +52,8 @@ function Workspace() {
     workerId: "",
     workspaceId: "",
   });
-
+  const {eventCallbackData} = useContext(AppContext)
+  
   const handleCreateWorkspace = async (workspace) => {
     try {
       const response = await createWorkspaceApi(workspace);
@@ -276,36 +279,37 @@ function Workspace() {
     }
   };
 
-  useEffect(() => {
-    // Create a connection to the SSE stream on /events
-    const eventSource = new EventSource("http://localhost:9091/events");
+  // useEffect(() => {
+  //   // Create a connection to the SSE stream on /events
+  //   const eventSource = new EventSource("http://localhost:9091/events");
 
-    // Check if the connection is established successfully
-    if (typeof EventSource !== "undefined") {
-      console.log("Event source listening");
-    } else {
-      console.log("Event Error");
-    }
+  //   // Check if the connection is established successfully
+  //   if (typeof eventSource !== "undefined") {
+  //     console.log("Event source listening");
+  //   } else {
+  //     console.log("Event Error");
+  //   }
 
-    // Listen for incoming messages (events) from the server
-    eventSource.onmessage = function (event) {
-      try {
-        const data = JSON.parse(event.data);
-        console.log("Received event:", data);
-        setEventCallback(data); // Ensure this is used elsewhere
-      } catch (error) {
-        console.error("Error parsing SSE data:", error);
-      }
-    };
+  //   // Listen for incoming messages (events) from the server
+  //   eventSource.onmessage = function (event) {
+  //     try {
+  //       const data = event.data
+  //       // const obj = JSON.parse(data)
+  //       console.log("Received event:", data);
+  //       setEventCallback(data); // Ensure this is used elsewhere
+  //     } catch (error) {
+  //       console.error("Error parsing SSE data:", error);
+  //     }
+  //   };
 
-    // Handle errors
-    eventSource.onerror = (error) => {
-      console.error("Error occurred with SSE", error);
-      eventSource.close();
-    };
+  //   // Handle errors
+  //   eventSource.onerror = (error) => {
+  //     console.error("Error occurred with SSE", error);
+  //     eventSource.close();
+  //   };
 
-    return () => eventSource.close();
-  }, [eventCallback]);
+  //   return () => eventSource.close();
+  // });
 
   useEffect(() => {
     console.log(Ids);
@@ -313,6 +317,10 @@ function Workspace() {
 
   return (
     <div>
+      <div>{eventCallbackData}</div>
+      
+        {eventCallbackData && console.log("real data here",JSON.parse(eventCallbackData))}
+      
       {/* Workspace */}
       <CreateWorkspace
         handleCreateWorkspace={handleCreateWorkspace}
