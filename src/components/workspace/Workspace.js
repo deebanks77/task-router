@@ -1,236 +1,174 @@
 import React, { useEffect, useState } from "react";
 import CreateWorkspace from "./CreateWorkspace";
 import UpdateWorkspace from "./UpdateWorkspace";
-import {
-  createWorkspace,
-  workspaceData,
-  defaultWorksflowData,
-  defaultQueueData,
-  defaultWorkerData,
-  defaultTaskData,
-} from "../../utils/defaultData";
-import {
-  createWorkspaceApi,
-  updateWorkspaceApi,
-  createWorkflowApi,
-} from "../../utils/api";
+import { createWorkspaceApi, createWorkflowApi } from "../../utils/api";
 import CreateWorkflow from "../workflow/CreateWorkflow";
 import CreateQueue from "../queues/CreateQueue";
 import { createQueueApi } from "../../utils/api";
-import CreateWorkers from "../workers/CreateWorkers";
-import CreateTask from "../tasks/CreateTasks";
+import Worker from "../workers/Worker";
+import Task from "../tasks/Tasks";
 import { createTaskApi } from "../../utils/api/task";
-import {
-  createWorkerApi,
-  getWorkerReservationApi,
-  updateWorkerApi,
-} from "../../utils/api/worker";
+import { createWorkerApi, updateWorkerApi } from "../../utils/api/worker";
+import ErrorBoundary from "../../components/ErrorBoundery";
+
+function getWorkspaceLocalstorage() {
+  const workspace = localStorage.getItem("Workspace");
+  return workspace ? JSON.parse(workspace) : [];
+}
+function getQueueLocalstorage() {
+  const queue = localStorage.getItem("Queue");
+  return queue ? JSON.parse(queue) : [];
+}
+function getWorkflowLocalstorage() {
+  const workflow = localStorage.getItem("Workflow");
+  return workflow ? JSON.parse(workflow) : [];
+}
+function getTaskLocalstorage() {
+  const task = localStorage.getItem("Task");
+  return task ? JSON.parse(task) : [];
+}
+function getCreateWorkerLocalstorage() {
+  const worker = localStorage.getItem("CreateWorkerResponse");
+  return worker ? JSON.parse(worker) : [];
+}
+function getWorkerLocalstorage() {
+  const worker = localStorage.getItem("Worker");
+  return worker ? JSON.parse(worker) : [];
+}
+function getWorkerReservationLocalstorage() {
+  const worker = localStorage.getItem("WorkerReservation");
+  return worker ? JSON.parse(worker) : [];
+}
+function getIdsLocalstorage() {
+  const Ids = localStorage.getItem("Ids");
+  return Ids
+    ? JSON.parse(Ids)
+    : {
+        workspaceId: [],
+        workerId: [],
+        queueId: [],
+        workflowId: [],
+        taskId: [],
+      };
+}
+function getWorkerActivitiessLocalstorage() {
+  const workerActivities = localStorage.getItem("WorkerActivities");
+  return workerActivities ? JSON.parse(workerActivities) : [];
+}
 
 function Workspace() {
-  const [defaultWorkspace, setDefaultWorkspace] = useState(createWorkspace);
-  const [updateWorkspace, setUpdateWorkspace] = useState(workspaceData);
-  const [defaultQueue, setDefaultQueue] = useState(defaultQueueData);
-  const [defaultWorkflow, setDefaultWorkflow] = useState(defaultWorksflowData);
-  const [defaultWorker, setDefaultWorker] = useState(defaultWorkerData);
-  const [workerActivities, setWorkerActivities] = useState();
-  const [defaultTask, setDefaultTask] = useState(defaultTaskData);
-  const [eventCallback, setEventCallback] = useState(null);
-  const [Ids, setIds] = useState({
-    workspaceId: null,
-    workerId: null,
-    queueId: null,
-    workflowId: null,
-  });
-  const [workerReservation, setWorkerReservation] = useState({
-    createdAt: "",
-    reservationId: "",
-    reservationsStatus: "",
-    taskId: "",
-    updatedAt: "",
-    workerId: "",
-    workspaceId: "",
-  });
+  const [updateWorkspace, setUpdateWorkspace] = useState(
+    getWorkspaceLocalstorage || []
+  );
+  const [queues, setQueues] = useState(getQueueLocalstorage || []);
+  const [workflow, setWorkflow] = useState(getWorkflowLocalstorage || []);
+  const [workerCreated, setWorkerCreated] = useState(
+    getCreateWorkerLocalstorage || []
+  );
+  const [workerActivities, setWorkerActivities] = useState(
+    getWorkerActivitiessLocalstorage || []
+  );
+  const [workersReservation, setWorkersReservation] = useState(
+    getWorkerReservationLocalstorage || []
+  );
+  const [Ids, setIds] = useState(
+    getIdsLocalstorage || {
+      workspaceId: [],
+      workerId: [],
+      queueId: [],
+      workflowId: [],
+      taskId: [],
+    }
+  );
 
+  // Create Workspace
   const handleCreateWorkspace = async (workspace) => {
     try {
       const response = await createWorkspaceApi(workspace);
-      // localStorage.setItem("workspace", response);
-      console.log(response);
-      setDefaultWorkspace({
-        name: response.name,
-        eventCallbackUrl: response.eventCallbackUrl,
-        multiTaskEnabled: response.multiTaskEnabled,
-        queueOrderPriority: response.queueOrderPriority,
-        eventsFilters: response.eventsFilters,
-        defaultActivityId: response.defaultActivityId,
-        timeoutActivityId: response.timeoutActivityId,
-      });
-      setUpdateWorkspace({
-        name: response.name,
-        eventCallbackUrl: response.eventCallbackUrl,
-        multiTaskEnabled: response.multiTaskEnabled,
-        queueOrderPriority: response.queueOrderPriority,
-        eventsFilters: response.eventsFilters,
-        defaultActivityId: response.defaultActivityId,
-        timeoutActivityId: response.timeoutActivityId,
-        workspaceId: response.workspaceId,
-      });
-      setWorkerActivities(response.activities);
-      // add workspaceId to the data
-      setDefaultWorkflow((prevWorkflow) => {
-        return { ...prevWorkflow, workspaceId: response.workspaceId };
-      });
-      setDefaultQueue((prevQueue) => {
-        return { ...prevQueue, workspaceId: response.workspaceId };
-      });
-      setDefaultWorker((prevWorker) => {
-        return {
-          ...prevWorker,
+      setUpdateWorkspace((workspace) => [
+        ...workspace,
+        {
+          name: response.name,
+          eventCallbackUrl: response.eventCallbackUrl,
+          multiTaskEnabled: response.multiTaskEnabled,
+          queueOrderPriority: response.queueOrderPriority,
+          eventsFilters: response.eventsFilters,
+          defaultActivityId: response.defaultActivityId,
+          timeoutActivityId: response.timeoutActivityId,
           workspaceId: response.workspaceId,
-          activity: response.activities[0].uuid,
-        };
-      });
-      setDefaultTask((prevTask) => {
-        return { ...prevTask, workspaceId: response.workspaceId };
-      });
+        },
+      ]);
+      setWorkerActivities(response.activities);
+      // setWorkerActivities((prevActivities) => [
+      //   ...prevActivities,
+      //   response.activities,
+      // ]);
+      console.log("handleCreateWorkspace", response);
       setIds((prevIDS) => {
-        return { ...prevIDS, workspaceId: response.workspaceId };
+        return {
+          ...prevIDS,
+          workspaceId: [...prevIDS.workspaceId, response.workspaceId],
+        };
       });
     } catch (error) {
       console.log(error);
     }
   };
 
+  // Update Workspace
   const handleUpdateWorkspace = async (workspace) => {
     return;
-    // console.log("handleUpdateWorkspace", workspace);
-    // try {
-    //   const response = await updateWorkspaceApi(workspace);
-    //   console.log("handleUpdateWorkspace response", response);
-    //   setDefaultWorkspace({
-    //     name: response.name,
-    //     eventCallbackUrl: response.eventCallbackUrl,
-    //     multiTaskEnabled: response.multiTaskEnabled,
-    //     queueOrderPriority: response.queueOrderPriority,
-    //     eventsFilters: response.eventsFilters,
-    //     defaultActivityId: response.defaultActivityId,
-    //     timeoutActivityId: response.timeoutActivityId,
-    //   });
-    //   setUpdateWorkspace({
-    //     name: response.name,
-    //     eventCallbackUrl: response.eventCallbackUrl,
-    //     multiTaskEnabled: response.multiTaskEnabled,
-    //     queueOrderPriority: response.queueOrderPriority,
-    //     eventsFilters: response.eventsFilters,
-    //     defaultActivityId: response.defaultActivityId,
-    //     timeoutActivityId: response.timeoutActivityId,
-    //   });
-    //   setDefaultWorkflow((prevWorkflow) => {
-    //     return { ...prevWorkflow, workspaceId: response.workspaceId };
-    //   });
-    //   setDefaultQueue((prevQueue) => {
-    //     return { ...prevQueue, workspaceId: response.workspaceId };
-    //   });
-    // } catch (error) {
-    //   console.log(error);
-    // }
   };
 
   const handleCreateQueue = async (queue) => {
     console.log({ queue: queue });
     try {
       const response = await createQueueApi(queue);
-      localStorage.setItem("queue", JSON.stringify(response));
-      console.log({ createQueueResponse: response });
+      console.log("createQueueResponse", response);
 
-      setDefaultWorkflow((prevWorkflow) => {
-        return {
-          ...prevWorkflow,
-          configuration: JSON.stringify({
-            ...prevWorkflow.configuration,
-            task_routing: {
-              filters: [
-                {
-                  name: "en-sales",
-                  expression: "#{language}=='en'&&#{department}=='sales'",
-                  targets: [
-                    {
-                      queue: response.queueId,
-                      priority: 10,
-                      timeout: 3600,
-                    },
-                  ],
-                },
-                {
-                  name: "en-support",
-                  expression: "#{language}=='en'&&#{department}=='support'",
-                  targets: [
-                    {
-                      queue: response.queueId,
-                      priority: 0,
-                      timeout: 3600,
-                      expression:
-                        "#{task.preferred_agents}==#{worker.agent_id}",
-                    },
-                  ],
-                },
-              ],
-              default_filter: {
-                queue: response.queueId,
-              },
-            },
-          }),
-        };
-      });
+      setQueues((prevQueues) => [...prevQueues, response]);
 
-      setDefaultTask((prevTask) => {
-        return { ...prevTask, queueId: response.queueId };
-      });
       setIds((prevIDS) => {
-        return { ...prevIDS, queueId: response.queueId };
+        return { ...prevIDS, queueId: [...prevIDS.queueId, response.queueId] };
       });
     } catch (error) {
       console.log(error);
     }
   };
 
+  // Create Workflow
   const handleCreateWorkflow = async (worksflow) => {
+    console.log("handleCreateWorkflow parameter", worksflow);
     try {
       const response = await createWorkflowApi(worksflow);
-      console.log(handleCreateWorkflow, response);
-      setDefaultWorkflow({
-        name: worksflow.name,
-        configuration: worksflow.configuration,
-        documentContentType: "application/json",
-        taskReservationTimeout: 3600,
-        assignmentCallbackUrl: worksflow.assignmentCallbackUrl,
-        fallbackCallbackUrl: worksflow.fallbackCallbackUrl,
-      });
-      setDefaultTask((prevTask) => {
-        return { ...prevTask, workflowId: response.workflowId };
-      });
+      console.log("handleCreateWorkflow ", response);
+      setWorkflow((prevWorkflow) => [...prevWorkflow, response]);
+
+      if (response === "undefined") return;
       setIds((prevIds) => {
-        return { ...prevIds, workflowId: response.workflowId };
+        return {
+          ...prevIds,
+          workflowId: [...prevIds.workflowId, response.workflowId],
+        };
       });
     } catch (error) {
       console.log(error);
     }
   };
 
+  // Create Worker
   const handleCreateWorker = async (worker) => {
-    console.log("activities", workerActivities);
-    console.log("worker", worker);
+    console.log("handleCreateWorker parameter", worker);
     try {
       const response = await createWorkerApi(worker);
       console.log("handleCreateWorker", response);
-      setDefaultWorker({
-        name: worker.name,
-        attributes: worker.attributes,
-        activity: worker.activity,
-        workspaceId: worker.workspaceId,
-      });
+      setWorkerCreated((prevWorkers) => [...prevWorkers, response]);
+
       setIds((prevIDS) => {
-        return { ...prevIDS, workerId: response.workerId };
+        return {
+          ...prevIDS,
+          workerId: [...prevIDS.workerId, response.workerId],
+        };
       });
     } catch (error) {
       console.log(error);
@@ -248,76 +186,97 @@ function Workspace() {
         activiteId: activity.uuid,
       });
       console.log("Update worker response", response);
-      setWorkerReservation(response);
+      setWorkersReservation(response);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleGetWorkerReservation = async () => {
-    try {
-      const response = await getWorkerReservationApi({
-        workerId: Ids.workerId,
-        workspaceId: Ids.workspaceId,
-      });
-      console.log("handleGetWorkerReservation", response);
-      setWorkerReservation(response);
-    } catch (error) {
-      console.log(error);
-    }
+  const handleSetWorkerReservation = (reservation) => {
+    setWorkersReservation((prevReserv) => [...prevReserv, reservation]);
   };
 
+  // Task
   const handleCreateTask = async (task) => {
     try {
       const response = await createTaskApi(task);
-      console.log(handleCreateWorker, response);
+      setIds((prevIDS) => {
+        return {
+          ...prevIDS,
+          taskId: [...prevIDS.taskId, response.taskId],
+        };
+      });
+      console.log("handleCreateTask", response);
     } catch (error) {
       console.log(error);
     }
   };
 
+  // useEffect(() => {
+  //   // Create a connection to the SSE stream on /events
+  //   const eventSource = new EventSource("http://localhost:9091/events");
+
+  //   // Check if the connection is established successfully
+  //   if (typeof EventSource !== "undefined") {
+  //     console.log("Event source listening");
+  //   } else {
+  //     console.log("Event Error");
+  //   }
+
+  //   // Listen for incoming messages (events) from the server
+  //   eventSource.onmessage = function (event) {
+  //     try {
+  //       const data = JSON.parse(event.data);
+  //       console.log("Received event:", data);
+  //       setEventCallback(data); // Ensure this is used elsewhere
+  //     } catch (error) {
+  //       console.error("Error parsing SSE data:", error);
+  //     }
+  //   };
+
+  //   // Handle errors
+  //   eventSource.onerror = (error) => {
+  //     console.error("Error occurred with SSE", error);
+  //     eventSource.close();
+  //   };
+
+  //   return () => eventSource.close();
+  // }, [eventCallback]);
+
   useEffect(() => {
-    // Create a connection to the SSE stream on /events
-    const eventSource = new EventSource("http://localhost:9091/events");
-
-    // Check if the connection is established successfully
-    if (typeof EventSource !== "undefined") {
-      console.log("Event source listening");
-    } else {
-      console.log("Event Error");
-    }
-
-    // Listen for incoming messages (events) from the server
-    eventSource.onmessage = function (event) {
-      try {
-        const data = JSON.parse(event.data);
-        console.log("Received event:", data);
-        setEventCallback(data); // Ensure this is used elsewhere
-      } catch (error) {
-        console.error("Error parsing SSE data:", error);
-      }
-    };
-
-    // Handle errors
-    eventSource.onerror = (error) => {
-      console.error("Error occurred with SSE", error);
-      eventSource.close();
-    };
-
-    return () => eventSource.close();
-  }, [eventCallback]);
+    localStorage.setItem("Workspace", JSON.stringify(updateWorkspace));
+    // console.log("Workspace", updateWorkspace);
+  }, [updateWorkspace]);
 
   useEffect(() => {
-    console.log(Ids);
+    localStorage.setItem("Queue", JSON.stringify(queues));
+    // console.log("Queue", queues);
+  }, [queues]);
+
+  useEffect(() => {
+    localStorage.setItem("Workflow", JSON.stringify(workflow));
+    // console.log("Workflow", workflow);
+  }, [workflow]);
+
+  useEffect(() => {
+    localStorage.setItem("CreateWorkerResponse", JSON.stringify(workerCreated));
+    // console.log("CreateWorkerResponse", workerCreated);
+  }, [workerCreated]);
+
+  useEffect(() => {
+    localStorage.setItem("Ids", JSON.stringify(Ids));
+    // console.log("Ids", Ids);
   }, [Ids]);
 
+  useEffect(() => {
+    localStorage.setItem("WorkerActivities", JSON.stringify(workerActivities));
+    // console.log("workerActivities", workerActivities);
+  }, [workerActivities]);
+
   return (
-    <div>
+    <ErrorBoundary>
       {/* Workspace */}
-      <CreateWorkspace
-        handleCreateWorkspace={handleCreateWorkspace}
-        defaultWorkspace={defaultWorkspace}
-      />
+      <CreateWorkspace handleCreateWorkspace={handleCreateWorkspace} />
       <UpdateWorkspace
         handleUpdateWorkspace={handleUpdateWorkspace}
         updateWorkspace={updateWorkspace}
@@ -326,33 +285,33 @@ function Workspace() {
       {/* Queue */}
       <CreateQueue
         handleCreateQueue={handleCreateQueue}
-        defaultQueue={defaultQueue}
+        queues={queues}
+        ids={Ids}
       />
 
       {/* Workflow */}
       <CreateWorkflow
         handleCreateWorkflow={handleCreateWorkflow}
-        defaultWorkflow={defaultWorkflow}
+        workflow={workflow}
+        ids={Ids}
+        workerActivities={workerActivities}
       />
 
       {/* Workers*/}
-      <CreateWorkers
+      <Worker
         handleCreateWorker={handleCreateWorker}
-        defaultWorker={defaultWorker}
-        handleGetWorkerReservation={handleGetWorkerReservation}
-        workerReservation={workerReservation}
-        handleUpdateWorker={handleUpdateWorker}
+        ids={Ids}
+        workerActivities={workerActivities}
+        workersReservation={workersReservation}
+        handleSetWorkerReservation={handleSetWorkerReservation}
       />
 
       {/* Task*/}
-      <CreateTask
-        handleCreateTask={handleCreateTask}
-        defaultTask={defaultTask}
-      />
+      <Task handleCreateTask={handleCreateTask} ids={Ids} />
 
       {/* Tell us if task is assigned */}
       <div className="container">Tell us if task is assigned</div>
-    </div>
+    </ErrorBoundary>
   );
 }
 

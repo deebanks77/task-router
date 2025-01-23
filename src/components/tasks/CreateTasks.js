@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { defaultTaskForm } from "../../utils/defaultData";
 
-function CreateTask({ handleCreateTask, defaultTask }) {
-  const [task, setTask] = useState(defaultTask);
+function CreateTask({ handleCreateTask, ids }) {
+  const [task, setTask] = useState(defaultTaskForm);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // if (task.workspaceId === "") {
-    //   return;
-    // }
     console.log("task", task);
     await handleCreateTask(task);
   };
@@ -19,10 +17,20 @@ function CreateTask({ handleCreateTask, defaultTask }) {
   };
 
   useEffect(() => {
-    console.log({ defaultTask: defaultTask });
+    // console.log({ ids: ids });
+    setTask((prevTask) => {
+      return {
+        ...prevTask,
+        workflowId: ids.workflowId[0],
+        workspaceId: ids.workspaceId[0],
+        queueId: ids.queueId[0],
+      };
+    });
+  }, [ids]);
 
-    setTask(defaultTask);
-  }, [defaultTask]);
+  // useEffect(() => {
+  //   console.log({ task: task });
+  // }, [task]);
 
   return (
     <div className="container">

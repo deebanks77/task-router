@@ -1,38 +1,65 @@
 import React, { useState, useEffect } from "react";
+import { defaultWorksflowForm } from "../../utils/defaultData";
 
-function CreateWorkflow({ handleCreateWorkflow, defaultWorkflow }) {
-  const [workflow, setWorkflow] = useState(defaultWorkflow);
+function CreateWorkflow({ handleCreateWorkflow, workflow, ids }) {
+  const [workflowForm, setWorkflowForm] = useState(defaultWorksflowForm);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (workflow.name === "" || workflow.workspaceId === "") {
+    if (workflowForm.name === "") {
       return;
     }
-    await handleCreateWorkflow(workflow);
+    await handleCreateWorkflow(workflowForm);
   };
 
   const handleNameChange = (event) => {
-    setWorkflow((prevWorkflow) => {
-      return { ...prevWorkflow, name: event.target.value };
+    setWorkflowForm((prevWorkflow) => {
+      return {
+        ...prevWorkflow,
+        name: event.target.value,
+      };
     });
   };
 
   useEffect(() => {
-    console.log({ updatedtWorkflow: defaultWorkflow });
-
-    setWorkflow((prevWorkflow) => {
-      return {
-        ...prevWorkflow,
-        name: defaultWorkflow.name,
-        configuration: defaultWorkflow.configuration,
-        documentContentType: "application/json",
-        taskReservationTimeout: 3600,
-        assignmentCallbackUrl: defaultWorkflow.assignmentCallbackUrl,
-        fallbackCallbackUrl: defaultWorkflow.fallbackCallbackUrl,
-        workspaceId: defaultWorkflow.workspaceId,
-      };
+    setWorkflowForm({
+      ...workflowForm,
+      configuration: JSON.stringify({
+        ...workflowForm.configuration,
+        task_routing: {
+          filters: [
+            {
+              name: "en-sales",
+              expression: "#{language}=='en'&&#{department}=='sales'",
+              targets: [
+                {
+                  queue: ids.queueId[0],
+                  priority: 10,
+                  timeout: 3600,
+                },
+              ],
+            },
+            {
+              name: "en-support",
+              expression: "#{language}=='en'&&#{department}=='support'",
+              targets: [
+                {
+                  queue: ids.queueId[0],
+                  priority: 0,
+                  timeout: 3600,
+                  expression: "#{task.preferred_agents}==#{worker.agent_id}",
+                },
+              ],
+            },
+          ],
+          default_filter: {
+            queue: ids.queueId[0],
+          },
+        },
+      }),
+      workspaceId: ids.workspaceId[0],
     });
-  }, [defaultWorkflow]);
+  }, [ids.queueId, ids.workspaceId]);
 
   return (
     <div className="container">
@@ -41,8 +68,9 @@ function CreateWorkflow({ handleCreateWorkflow, defaultWorkflow }) {
         <div className="form-input">
           <label>Workflow name</label>
           <input
+            name="name"
             onChange={handleNameChange}
-            value={workflow.name}
+            value={workflowForm.name}
             type="text"
             placeholder="Simplexi Workflow"
           />
@@ -51,6 +79,17 @@ function CreateWorkflow({ handleCreateWorkflow, defaultWorkflow }) {
           <button>Create Workflow</button>
         </div>
       </form>
+
+      <div>
+        <h3>List of Workflow</h3>
+        {workflow.length > 0
+          ? workflow.map((workflow) => (
+              <p key={workflow.workflowId}>
+                WorkflowId : {workflow.workflowId}
+              </p>
+            ))
+          : ""}
+      </div>
     </div>
   );
 }

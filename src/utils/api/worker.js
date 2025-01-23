@@ -17,7 +17,20 @@ export const createWorkerApi = async ({
       return response.data;
     })
     .catch((error) => {
-      console.error("Error during create worker:", error);
+      throw new Error(error);
+    });
+
+  return res;
+};
+export const getWorkspaceWorkerApi = async ({ workspaceId }) => {
+  const res = axiosInstance
+    .get(`/worker/${workspaceId}`)
+    .then((response) => {
+      console.log("Get workspace workers successful:", response);
+      return response.data;
+    })
+    .catch((error) => {
+      throw new Error(error);
     });
 
   return res;
@@ -25,18 +38,18 @@ export const createWorkerApi = async ({
 export const updateWorkerApi = async ({
   workerId,
   workspaceId,
-  activiteId,
+  activityId,
 }) => {
   const res = axiosInstance
     .put(`/worker/${workspaceId}/${workerId}`, {
-      activityId: activiteId,
+      activityId,
     })
     .then((response) => {
       console.log("Update Reservation Status successful:", response);
       return response.data;
     })
     .catch((error) => {
-      console.error("Error during Update Worker Reservation Status :", error);
+      throw new Error(error);
     });
 
   return res;
@@ -50,7 +63,30 @@ export const getWorkerReservationApi = async ({ workerId, workspaceId }) => {
       return response.data;
     })
     .catch((error) => {
-      console.error("Error during get Worker Reservation Status :", error);
+      throw new Error(error);
+    });
+
+  return res;
+};
+
+export const workerReservationResponseApi = async ({
+  workerId,
+  workspaceId,
+  reservationId,
+  instruction,
+  activityId,
+}) => {
+  const res = axiosInstance
+    .post(
+      `/worker/assignment/response/${workspaceId}/${workerId}/${reservationId}`,
+      { instruction, activityId }
+    )
+    .then((response) => {
+      console.log("Worker Reservation Response Status successful:", response);
+      return response.data;
+    })
+    .catch((error) => {
+      throw new Error(error);
     });
 
   return res;

@@ -60,7 +60,7 @@ export const workspaceData = {
   workspaceId: "",
 };
 
-export const defaultQueueData = {
+export const defaultQueueForm = {
   name: "sales-queue",
   taskOrder: "FIFO",
   expression: "HAS(#{language},'en') && #{department}=='sales'",
@@ -70,7 +70,7 @@ export const defaultQueueData = {
   workspaceId: "",
 };
 
-export const defaultWorksflowData = {
+export const defaultWorksflowForm = {
   name: "",
   configuration: `{"task_routing":{"filters":[{"name":"en-sales","expression":"#{language}==\'en\'&&#{department}==\'sales\'","targets":[{"queue":"WQcu36np9uljv09kfvvvu0","priority":10,"timeout":3600}]},{"name":"en-support","expression":"#{language}==\'en\'&&#{department}==\'support\'","targets":[{"queue":"WQcu36np9uljv09kfvvvu0","priority":0,"timeout":3600,"expression":"#{task.preferred_agents}==#{worker.agent_id}"}]}],"default_filter":{"queue":"WQcu36np9uljv09kfvvvu0"}}}`,
   documentContentType: "application/json",
@@ -80,18 +80,18 @@ export const defaultWorksflowData = {
   workspaceId: "",
 };
 
-export const defaultWorkerData = {
+export const defaultWorkerForm = {
   name: "Ejiroghene Precious",
   attributes: {
     language: ["en"],
     department: "sales",
   },
-  activity: "WAcu1fgapn91tb8ueretvg",
+  activity: null,
   workspaceId: "",
 };
 
-export const defaultTaskData = {
-  workflowId: "WWcu190khn91t78qvvvvvg",
+export const defaultTaskForm = {
+  workflowId: "",
   taskChannel: "voice",
   priority: 10,
   timeout: 600,
@@ -100,7 +100,7 @@ export const defaultTaskData = {
     department: "sales",
   },
   ignoreCapacity: false,
-  queueId: "WQcu1790pn91t4dp7vvvog",
-  callbackUrl: "http://example.com/task/callback",
+  queueId: "",
+  callbackUrl: "http://localhost:9091/v1/callback/assignment/created",
   workspaceId: "",
 };

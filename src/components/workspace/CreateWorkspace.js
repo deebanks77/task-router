@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { createWorkspace } from "../../utils/defaultData";
 
-function CreateWorkspace({ handleCreateWorkspace, defaultWorkspace }) {
-  const [workspace, setWorkspace] = useState(defaultWorkspace);
+function CreateWorkspace({ handleCreateWorkspace }) {
+  const [workspace, setWorkspace] = useState(createWorkspace);
 
   const handleSubmit = async (event) => {
     event.preventDefault();

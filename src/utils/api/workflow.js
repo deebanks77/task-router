@@ -24,6 +24,7 @@ export const createWorkflowApi = async ({
     })
     .catch((error) => {
       console.error("Error during create workflow:", error);
+      throw new Error(error);
     });
 
   return res;

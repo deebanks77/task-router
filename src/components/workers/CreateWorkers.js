@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { defaultWorkerForm } from "../../utils/defaultData";
 
-function CreateWorkers({
-  handleCreateWorker,
-  defaultWorker,
-  handleGetWorkerReservation,
-  workerReservation,
-  handleUpdateWorker,
-}) {
-  const [worker, setWorker] = useState(defaultWorker);
+function CreateWorkers({ handleCreateWorker, ids, workerActivities }) {
+  const [worker, setWorker] = useState(defaultWorkerForm);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (worker.name === "" || worker.workspaceId === "") {
+    if (worker.name === "" || ids.workspaceId.length <= 0) {
       return;
     }
     await handleCreateWorker(worker);
@@ -24,143 +19,48 @@ function CreateWorkers({
   };
 
   useEffect(() => {
-    console.log({ defaultWorker: defaultWorker });
+    if (ids.workspaceId.length <= 0) return;
 
     setWorker((prevWorkers) => {
       return {
         ...prevWorkers,
-        name: defaultWorker.name,
-        attributes: {
-          language: ["en"],
-          department: "sales",
-        },
-        activity: defaultWorker.activity,
-        workspaceId: defaultWorker.workspaceId,
+        workspaceId: ids.workspaceId[0],
       };
     });
-  }, [defaultWorker]);
+  }, [ids]);
+
+  // useEffect(() => {
+  //   if (workerActivities.length <= 0) return;
+  //   console.log("workerActivities", workerActivities);
+
+  //   const availableActivityId = workerActivities.filter(
+  //     (activity) => activity.name === "Available"
+  //   ).uuid;
+  //   setWorker((prevWorkers) => {
+  //     return {
+  //       ...prevWorkers,
+  //       activity: availableActivityId,
+  //     };
+  //   });
+  // }, [workerActivities]);
 
   return (
     <div className="container">
-      <div>
-        <h3>Create Worker</h3>
-        <form className="form" onSubmit={handleSubmit}>
-          <div className="form-input">
-            <label>Worker name</label>
-            <input
-              onChange={handleNameChange}
-              value={worker.name}
-              type="text"
-              placeholder="Simplexi Workflow"
-            />
-          </div>
-          <div>
-            <button>Create Worker</button>
-          </div>
-        </form>
-      </div>
-
-      {/* Get worker reservation status */}
-      <div className="container">
-        <h3>Worker reservation status</h3>
-        <div>
-          <button onClick={handleGetWorkerReservation}>
-            Get worker reservation status
-          </button>
+      <h3>Create Worker</h3>
+      <form className="form" onSubmit={handleSubmit}>
+        <div className="form-input">
+          <label>Worker name</label>
+          <input
+            onChange={handleNameChange}
+            value={worker.name}
+            type="text"
+            placeholder="Simplexi Workflow"
+          />
         </div>
-
-        <form className="form">
-          <div className="form-input">
-            <label>Reservation ID</label>
-            <input
-              value={workerReservation.reservationId}
-              type="text"
-              readOnly
-            />
-          </div>
-          <div className="form-input">
-            <label>Reservations Status</label>
-            <input
-              value={workerReservation.reservationsStatus}
-              type="text"
-              readOnly
-            />
-          </div>
-          <div className="form-input">
-            <label>Task ID</label>
-            <input value={workerReservation.taskId} type="text" readOnly />
-          </div>
-          <div className="form-input">
-            <label>Worker ID</label>
-            <input value={workerReservation.workerId} type="text" readOnly />
-          </div>
-          <div className="form-input">
-            <label>Workspace ID</label>
-            <input value={workerReservation.workspaceId} type="text" readOnly />
-          </div>
-        </form>
-      </div>
-
-      {/* Update Worker */}
-      <div className="container">
-        <h3> Update Worker </h3>
         <div>
-          <button onClick={handleUpdateWorker}>
-            Update worker reservation
-          </button>
+          <button>Create Worker</button>
         </div>
-      </div>
-
-      {/* Reservation Response */}
-      <div className="container">
-        <h3>Worker reservation</h3>
-
-        <form className="form" onSubmit={handleGetWorkerReservation}>
-          <div className="form-input">
-            <label>Reservation ID</label>
-            <input
-              onChange={handleNameChange}
-              value={workerReservation.reservationId}
-              type="text"
-            />
-          </div>
-          <div className="form-input">
-            <label>Reservations Status</label>
-            <input
-              onChange={handleNameChange}
-              value={workerReservation.reservationsStatus}
-              type="text"
-            />
-          </div>
-          <div className="form-input">
-            <label>Task ID</label>
-            <input
-              onChange={handleNameChange}
-              value={workerReservation.taskId}
-              type="text"
-            />
-          </div>
-          <div className="form-input">
-            <label>Worker ID</label>
-            <input
-              onChange={handleNameChange}
-              value={workerReservation.workerId}
-              type="text"
-            />
-          </div>
-          <div className="form-input">
-            <label>Workspace ID</label>
-            <input
-              onChange={handleNameChange}
-              value={workerReservation.workspaceId}
-              type="text"
-            />
-          </div>
-          <div>
-            <button>worker reservation </button>
-          </div>
-        </form>
-      </div>
+      </form>
     </div>
   );
 }

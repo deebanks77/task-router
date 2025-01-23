@@ -1,76 +1,73 @@
 import React, { useState, useEffect } from "react";
+import { defaultQueueForm } from "../../utils/defaultData";
 
-function CreateQueue({ handleCreateQueue, defaultQueue }) {
-  const [queue, setQueue] = useState(defaultQueue);
+function CreateQueue({ handleCreateQueue, queues, ids }) {
+  const [queueForm, setQueueForm] = useState(defaultQueueForm);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (queue.name === "" || queue.workspaceId === "") {
+    if (queueForm.name === "" || ids.workspaceId.length <= 0) {
       return;
     }
-    await handleCreateQueue(queue);
+    await handleCreateQueue({ ...queueForm, workspaceId: ids.workspaceId[0] });
   };
 
   const handleNameChange = (event) => {
-    setQueue((prevQueue) => {
+    setQueueForm((prevQueue) => {
       return { ...prevQueue, name: event.target.value };
     });
   };
 
   useEffect(() => {
-    console.log({ defaultQueue: defaultQueue });
-
-    setQueue((prevWorkflow) => {
-      return {
-        ...prevWorkflow,
-        name: defaultQueue.name,
-        taskOrder: defaultQueue.taskOrder,
-        expression: defaultQueue.expression,
-        maxReservedWorkers: defaultQueue.maxReservedWorkers,
-        reservationActivityId: defaultQueue.reservationActivityId,
-        assignmentActivityId: defaultQueue.assignmentActivityId,
-        workspaceId: defaultQueue.workspaceId,
-      };
-    });
-  }, [defaultQueue]);
-
-  useEffect(() => {
-    console.log({ queue: queue });
-
-    // setQueue((prevWorkflow) => {
-    //   return {
-    //     ...prevWorkflow,
-    //     name: defaultQueue.name,
-    //     taskOrder: defaultQueue.taskOrder,
-    //     expression: defaultQueue.expression,
-    //     maxReservedWorkers: defaultQueue.maxReservedWorkers,
-    //     reservationActivityId: defaultQueue.reservationActivityId,
-    //     assignmentActivityId: defaultQueue.assignmentActivityId,
-    //     workspaceId: defaultQueue.workspaceId,
-    //   };
-    // });
-  }, [defaultQueue.name]);
+    console.log({ queues: queues });
+  }, [queues]);
 
   return (
     <div className="container">
       <h3>Create Queue</h3>
-      <form className="form" onSubmit={handleSubmit}>
-        <div className="form-input">
-          <label>Queue name</label>
-          <select
-            onChange={handleNameChange}
-            value={queue.name}
-            type="text"
-            placeholder="Sales Queue"
-          >
-            <option value={"sales-queue"}>sales queue</option>
-            <option value={"customer-service"}>customer service</option>
-          </select>
-        </div>
+      <div>
+        <form className="form" onSubmit={handleSubmit}>
+          <div className="form-input">
+            <label>Queue name</label>
+            <select
+              onChange={handleNameChange}
+              value={queueForm.name}
+              type="text"
+              placeholder="Sales Queue"
+            >
+              <option value={"sales-queue"}>sales queue</option>
+              <option value={"customer-service"}>customer service</option>
+            </select>
+          </div>
+          <div>
+            <button>Create Queue</button>
+          </div>
+        </form>
         <div>
-          <button>Create Queue</button>
+          <h3>List of Queues Created</h3>
+          {queues.length > 0 ? (
+            <div className="multipleForm-container border">
+              {queues.map((queue) => (
+                <div key={queue.queueId}>
+                  <p>QueueId : {queue.queueId}</p>
+                  <p>
+                    addedWorkers :{" "}
+                    {queue.addedWorkers > 0
+                      ? queue.addedWorkers
+                      : "No worker on the queue"}
+                  </p>
+                  <p>
+                    removedWorkers :{" "}
+                    {queue.removedWorkers > 0 ? queue.removedWorkers : 0}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div></div>
+          )}
         </div>
-      </form>
+      </div>
     </div>
   );
 }
