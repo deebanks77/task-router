@@ -113,6 +113,15 @@ function UpdateWorkspace({ handleUpdateWorkspace, updateWorkspace }) {
                     type="text"
                   />
                 </div>
+                <div className="form-input">
+                  <label>WorkspaceId</label>
+                  <input
+                    name="timeoutActivityId"
+                    onChange={handleNameChange}
+                    value={workspace.workspaceId}
+                    type="text"
+                  />
+                </div>
                 <div>
                   <button>Update Workspace</button>
                 </div>
