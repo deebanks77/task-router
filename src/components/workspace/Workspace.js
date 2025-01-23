@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CreateWorkspace from "./CreateWorkspace";
 import UpdateWorkspace from "./UpdateWorkspace";
 import { createWorkspaceApi, createWorkflowApi } from "../../utils/api";
@@ -10,6 +10,7 @@ import Task from "../tasks/Tasks";
 import { createTaskApi } from "../../utils/api/task";
 import { createWorkerApi, updateWorkerApi } from "../../utils/api/worker";
 import ErrorBoundary from "../../components/ErrorBoundery";
+import { AppContext } from "../../store/store";
 
 function getWorkspaceLocalstorage() {
   const workspace = localStorage.getItem("Workspace");
@@ -85,6 +86,8 @@ function Workspace() {
   const handleCreateWorkspace = async (workspace) => {
     try {
       const response = await createWorkspaceApi(workspace);
+      console.log("response", response);
+
       setUpdateWorkspace((workspace) => [
         ...workspace,
         {
@@ -272,6 +275,12 @@ function Workspace() {
     localStorage.setItem("WorkerActivities", JSON.stringify(workerActivities));
     // console.log("workerActivities", workerActivities);
   }, [workerActivities]);
+
+  const { eventCallbackData } = useContext(AppContext);
+
+  const eventCallback = JSON.parse(eventCallbackData);
+
+  console.log("eventCallbackData", eventCallback);
 
   return (
     <ErrorBoundary>
