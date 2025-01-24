@@ -25,7 +25,7 @@ export const AppProvider = ({ children }) => {
     // Append the event data to the DOM or handle it as needed
     try {
       const parsedData = JSON.parse(event.data);
-      // console.log("Parsed event data:", parsedData);
+      console.log("Parsed event data:", parsedData);
       setEventCallbackData(parsedData); // Use parsed data
     } catch (error) {
       console.error("Error parsing event data:", error);

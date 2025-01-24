@@ -3,7 +3,7 @@ import CreateWorkspace from "./CreateWorkspace";
 import UpdateWorkspace from "./UpdateWorkspace";
 import { createWorkspaceApi, createWorkflowApi } from "../../utils/api";
 import CreateWorkflow from "../workflow/CreateWorkflow";
-import CreateQueue from "../queues/CreateQueue";
+import Queue from "../queues/Queues";
 import { createQueueApi } from "../../utils/api";
 import Worker from "../workers/Worker";
 import Task from "../tasks/Tasks";
@@ -11,6 +11,7 @@ import { createTaskApi } from "../../utils/api/task";
 import { createWorkerApi, updateWorkerApi } from "../../utils/api/worker";
 import ErrorBoundary from "../../components/ErrorBoundery";
 import { AppContext } from "../../store/store";
+import { toast } from "react-toastify";
 
 function getWorkspaceLocalstorage() {
   const workspace = localStorage.getItem("Workspace");
@@ -215,72 +216,128 @@ function Workspace() {
     }
   };
 
-  // useEffect(() => {
-  //   // Create a connection to the SSE stream on /events
-  //   const eventSource = new EventSource("http://localhost:9091/events");
-
-  //   // Check if the connection is established successfully
-  //   if (typeof EventSource !== "undefined") {
-  //     console.log("Event source listening");
-  //   } else {
-  //     console.log("Event Error");
-  //   }
-
-  //   // Listen for incoming messages (events) from the server
-  //   eventSource.onmessage = function (event) {
-  //     try {
-  //       const data = JSON.parse(event.data);
-  //       console.log("Received event:", data);
-  //       setEventCallback(data); // Ensure this is used elsewhere
-  //     } catch (error) {
-  //       console.error("Error parsing SSE data:", error);
-  //     }
-  //   };
-
-  //   // Handle errors
-  //   eventSource.onerror = (error) => {
-  //     console.error("Error occurred with SSE", error);
-  //     eventSource.close();
-  //   };
-
-  //   return () => eventSource.close();
-  // }, [eventCallback]);
-
   useEffect(() => {
     localStorage.setItem("Workspace", JSON.stringify(updateWorkspace));
-    // console.log("Workspace", updateWorkspace);
   }, [updateWorkspace]);
 
   useEffect(() => {
     localStorage.setItem("Queue", JSON.stringify(queues));
-    // console.log("Queue", queues);
   }, [queues]);
 
   useEffect(() => {
     localStorage.setItem("Workflow", JSON.stringify(workflow));
-    // console.log("Workflow", workflow);
   }, [workflow]);
 
   useEffect(() => {
     localStorage.setItem("CreateWorkerResponse", JSON.stringify(workerCreated));
-    // console.log("CreateWorkerResponse", workerCreated);
   }, [workerCreated]);
 
   useEffect(() => {
     localStorage.setItem("Ids", JSON.stringify(Ids));
-    // console.log("Ids", Ids);
   }, [Ids]);
 
   useEffect(() => {
     localStorage.setItem("WorkerActivities", JSON.stringify(workerActivities));
-    // console.log("workerActivities", workerActivities);
   }, [workerActivities]);
 
   const { eventCallbackData } = useContext(AppContext);
 
-  const eventCallback = JSON.parse(eventCallbackData);
+  useEffect(() => {
+    console.log("eventCallbackData", eventCallbackData);
+    if (eventCallbackData?.msg === "keep alive") return;
 
-  console.log("eventCallbackData", eventCallback);
+    if (typeof eventCallbackData === "object") {
+      if (eventCallbackData.eventType === "worker.created") {
+        console.log("event", eventCallbackData);
+        toast.success(
+          <div>
+            <h3>Worker Created</h3>
+            <p>Name: {eventCallbackData.name}</p>
+            <p>WorkerId: {eventCallbackData.workerId}</p>
+            <p>WorkspaceId: {eventCallbackData.workspaceId}</p>
+            <p>ActivityId: {eventCallbackData.activityId}</p>
+          </div>
+        );
+      }
+      if (eventCallbackData.eventType === "worker.activity.update") {
+        console.log("event", eventCallbackData);
+        toast.success(
+          <div>
+            <h3>Worker activity updated</h3>
+            <p>WorkerId: {eventCallbackData.workerId}</p>
+            <p>WorkspaceId: {eventCallbackData.workspaceId}</p>
+            <p>ActivityId: {eventCallbackData.activityId}</p>
+          </div>
+        );
+      }
+      if (eventCallbackData.eventType === "task.assigned") {
+        console.log("event", eventCallbackData);
+        toast.success(
+          <div>
+            <h3>Task Assigned!</h3>
+            <p>TaskId: {eventCallbackData.taskId}</p>
+            <p>WorkspaceId: {eventCallbackData.workspaceId}</p>
+            <p>Status: {eventCallbackData.assignmentStatus}</p>
+          </div>
+        );
+      }
+      if (eventCallbackData.eventType === "task.reserved") {
+        console.log("event", eventCallbackData);
+        toast.success(
+          <div>
+            <h3>Task Reserved!</h3>
+            <p>TaskId: {eventCallbackData.taskId}</p>
+            <p>WorkspaceId: {eventCallbackData.workspaceId}</p>
+            <p>Status: {eventCallbackData.assignmentStatus}</p>
+          </div>
+        );
+      }
+      if (eventCallbackData.eventType === "task.completed") {
+        console.log("event", eventCallbackData);
+        toast.success(
+          <div>
+            <h3>Task Completed!</h3>
+            <p>TaskId: {eventCallbackData.taskId}</p>
+            <p>WorkspaceId: {eventCallbackData.workspaceId}</p>
+            <p>Status: {eventCallbackData.assignmentStatus}</p>
+          </div>
+        );
+      }
+      if (eventCallbackData.eventType === "reservation.accepted") {
+        console.log("event", eventCallbackData);
+        toast.success(
+          <div>
+            <h3>Reservation Accepted</h3>
+            <p>WorkflowId: {eventCallbackData.workflowId}</p>
+            <p>WorkspaceId: {eventCallbackData.workspaceId}</p>
+            <p>QueueId: {eventCallbackData.queueId}</p>
+          </div>
+        );
+      }
+      if (eventCallbackData.eventType === "reservation.canceled") {
+        console.log("event", eventCallbackData);
+        toast.success(
+          <div>
+            <h3>Reservation Cancled</h3>
+            <p>WorkflowId: {eventCallbackData.workflowId}</p>
+            <p>WorkspaceId: {eventCallbackData.workspaceId}</p>
+            <p>QueueId: {eventCallbackData.queueId}</p>
+          </div>
+        );
+      }
+      if (eventCallbackData.eventType === "reservation.rejected") {
+        console.log("event", eventCallbackData);
+        toast.success(
+          <div>
+            <h3>Reservation Rejected</h3>
+            <p>WorkflowId: {eventCallbackData.workflowId}</p>
+            <p>WorkspaceId: {eventCallbackData.workspaceId}</p>
+            <p>QueueId: {eventCallbackData.queueId}</p>
+          </div>
+        );
+      }
+    }
+  }, [eventCallbackData]);
 
   return (
     <ErrorBoundary>
@@ -292,11 +349,7 @@ function Workspace() {
       />
 
       {/* Queue */}
-      <CreateQueue
-        handleCreateQueue={handleCreateQueue}
-        queues={queues}
-        ids={Ids}
-      />
+      <Queue handleCreateQueue={handleCreateQueue} queues={queues} ids={Ids} />
 
       {/* Workflow */}
       <CreateWorkflow

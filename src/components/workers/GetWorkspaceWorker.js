@@ -32,8 +32,6 @@ function GetWorkspaceWorker({ handleSetWorkers, workers, ids }) {
           ? workers.map((worker, index) => (
               <div key={index}>
                 <p>Worker Name: {worker.name}</p>
-                <p>Activity Type: {worker.activityType}</p>
-                <p>Activity ID: {worker.activityId}</p>
                 <p>Worker ID: {worker.workerId}</p>
                 <p>
                   Queue Ids:{" "}
